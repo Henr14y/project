@@ -62,7 +62,15 @@ body{
   <div class="tab-content">
     <div id="home" class="tab-pane fade in active">
       
-<form action="#">
+<form action="#"  method="POST">
+  <div class="form-group">
+    <label for="Temperature">Enter city to search weather conditions:</label>
+    <input type="text" class="form-control" name="search" value={{c}}>
+  </div>
+
+
+  <button type="submit" class="btn btn-default btn-lg">Search</button>
+  <button type="submit" class=" pull-right btn-link"></button>
 
   <div class="form-group">
     <label for="Temperature">Temperature in celcius:</label>
@@ -81,6 +89,8 @@ body{
   
 
 </form>
+
+
 <br/>
 
 
@@ -89,7 +99,7 @@ body{
 
     <div id="menu1" class="tab-pane fade">
 
-<form action="#">
+<form action="POST">
 
   <div class="form-group">
     <label for="UserName">Temperature:</label>
