@@ -1,3 +1,5 @@
+import Adafruit_DHT
+import os
 from flask import Flask, render_template, redirect, url_for, request 
 import math, requests, json
 from twilio.rest import Client
@@ -5,7 +7,7 @@ from twilio.rest import Client
 app = Flask(__name__)
 
 def get_weather(city_name):
-	api_key = "d417dc0551776c3b502268c6c258dafb"
+	#api_key = os.environ['weather_api_key'}
 	base_url = "http://api.openweathermap.org/data/2.5/weather?"
 	complete_url = base_url + "appid=" + api_key + "&q=" + city_name
 
@@ -24,34 +26,47 @@ def get_weather(city_name):
 	else:
         	print("City not found")
 
+def breadboard():
+        sensor = Adafruit_DHT.DHT22
+        pin = 4
+        humidity1, temperature1 = Adafruit_DHT.read_retry(sensor, pin)
+
+        temp1 = math.floor(temperature1)
+        humid = math.floor(humidity1)
+
+        return temp1,humid
 
 
-def sms(city1,temp1,humid1,pres1):
-	account_sid = 'AC1aee1a7a3584630924166759198cfe43'
-	auth_token = '78d4869f364a22da940f2cbcfe3a92ad'
+def sms(city1,temp1,humid1,pres1, number):
+	if number is None:
+		return
+	#account_sid = os.environ['twilio_account_ssid'}
+	#auth_token = os.environ['twilio_auth_token'}
 	client = Client(account_sid, auth_token)
 
 	message = client.messages \
                 	.create(
                      		body="In " +city1 +", the temperature is " +str(temp1) +" celcuis, humidity is " +str(humid1) +" percent and pressure is " +str(pres1) +" Pascal.",
-                     		from_='+12562578784',
-                     		to='+233201895736'
+                     		from_='+12162085631',
+                     		to=number
         		         )
 	
 
 
 
 @app.route('/')
-def index(city="Accra"):
+def index(city="Accra", pnumber=None):
 	temp, humidity, pressure = get_weather(city)
-	sms(city,temp,humidity,pressure)
-	return render_template('home.html',c=city, t=temp, h=humidity, p=pressure)
+	btemp,bhumidity = breadboard()
+	sms(city,temp,humidity,pressure,pnumber)
+	return render_template('home.html',c=city, t=temp, h=humidity, p=pressure, t1=btemp ,h1 =bhumidity, pn=pnumber)
 
 @app.route('/', methods=['POST'])
 def my_form_post():
 	text = request.form['search']
-	print(text)
-	return index(text)
+	number = request.form['numero']
+	print(text, number)
+	return index(text, number)
 
 @app.route('/test')
 def test():
